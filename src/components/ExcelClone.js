@@ -56,7 +56,7 @@ const ExcelClone = () => {
 
       {/* Spreadsheet */}
       <div className="flex-1 overflow-auto">
-        <table className="border-collapse w-full">
+        <table className="table-auto border-collapse w-full">
           <thead>
             <tr>
               <th className="w-12 bg-gray-100 border border-gray-300"></th>
@@ -78,8 +78,8 @@ const ExcelClone = () => {
                     key={colIndex}
                     className={`border border-gray-300 p-0 relative ${
                       selectedCell?.row === rowIndex && selectedCell?.col === colIndex
-                        ? 'bg-blue-50'
-                        : ''
+                        ? 'bg-blue-100'
+                        : 'hover:bg-gray-50'
                     }`}
                   >
                     <input
