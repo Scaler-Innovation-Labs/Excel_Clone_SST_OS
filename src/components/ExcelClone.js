@@ -68,32 +68,32 @@ const ExcelClone = () => {
             </tr>
           </thead>
           <tbody>
-            {Array(ROWS).fill().map((_, rowIndex) => (
-              <tr key={rowIndex}>
-                <td className="bg-gray-100 border border-gray-300 text-center">
-                  {rowIndex + 1}
-                </td>
-                {Array(COLS).fill().map((_, colIndex) => (
-                  <td
-                    key={colIndex}
-                    className={`border border-gray-300 p-0 relative ${
+          {Array(ROWS).fill().map((_, rowIndex) => (
+            <tr key={rowIndex}>
+              <td className="bg-gray-100 border border-gray-300 text-center">
+                {rowIndex + 1}
+              </td>
+              {Array(COLS).fill().map((_, colIndex) => (
+                <td
+                  key={colIndex}
+                  className="p-0 relative"
+                >
+                  <input
+                    type="text"
+                    className={`w-full h-full px-2 py-1 outline-none bg-transparent border border-gray-300 ${
                       selectedCell?.row === rowIndex && selectedCell?.col === colIndex
-                        ? 'bg-blue-50'
-                        : ''
+                        ? 'bg-blue-50 border-blue-400'
+                        : 'hover:border-blue-400 hover:bg-gray-200'
                     }`}
-                  >
-                    <input
-                      type="text"
-                      className="w-full h-full px-2 py-1 border-none outline-none bg-transparent"
-                      value={data[rowIndex][colIndex]}
-                      onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                      onClick={() => handleCellSelect(rowIndex, colIndex)}
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
+                    value={data[rowIndex][colIndex]}
+                    onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
+                    onClick={() => handleCellSelect(rowIndex, colIndex)}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
         </table>
       </div>
     </div>
