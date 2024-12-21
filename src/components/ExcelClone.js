@@ -1,35 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './Tooltip.css'; // Add tooltip styles
 
-const ROWS = 20;
-const COLS = 26; // A to Z
+const Tooltip = ({ text, position }) => {
+  return (
+    <div className={`tooltip ${position}`}>
+      {text}
+    </div>
+  );
+};
 
 const ExcelClone = () => {
-  // State for cell data
-  const [data, setData] = useState(
-    Array(ROWS).fill().map(() => Array(COLS).fill(''))
-  );
-  
-  // State for selected cell
+  const ROWS = 20;
+  const COLS = 26; // A to Z
+  const [data, setData] = useState(Array(ROWS).fill().map(() => Array(COLS).fill('')));
   const [selectedCell, setSelectedCell] = useState(null);
-  
-  // State for formula bar
   const [formulaBarValue, setFormulaBarValue] = useState('');
+  const [tooltipText, setTooltipText] = useState(''); // State for dynamic tooltip
 
-  // Convert column index to letter (0 = A, 1 = B, etc.)
   const getColumnLabel = (index) => String.fromCharCode(65 + index);
 
-  // Handle cell selection
   const handleCellSelect = (rowIndex, colIndex) => {
     setSelectedCell({ row: rowIndex, col: colIndex });
     setFormulaBarValue(data[rowIndex][colIndex]);
   };
 
-  // Handle cell value change
   const handleCellChange = (rowIndex, colIndex, value) => {
     const newData = [...data];
     newData[rowIndex][colIndex] = value;
     setData(newData);
     setFormulaBarValue(value);
+  };
+
+  const handleKeyDown = (e) => {
+    const { row, col } = selectedCell || {};
+
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      setTooltipText("Use Arrow Keys to Navigate");
+    } else if (e.key === 'Tab') {
+      setTooltipText("Use Tab to Move to the Next Cell");
+    } else if (e.key === 'Enter') {
+      setTooltipText("Press Enter to Confirm");
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedCell]);
+
+  const Cell = ({ value, rowIndex, colIndex }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    return (
+      <td
+        className={`border border-gray-300 p-0 relative ${selectedCell?.row === rowIndex && selectedCell?.col === colIndex ? 'bg-blue-50' : ''}`}
+      >
+        <div
+          className="cell"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <input
+            type="text"
+            className="w-full h-full px-2 py-1 border-none outline-none bg-transparent"
+            value={value}
+            onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
+            onClick={() => handleCellSelect(rowIndex, colIndex)}
+          />
+          {showTooltip && <Tooltip text={tooltipText} position="bottom" />}
+        </div>
+      </td>
+    );
   };
 
   return (
@@ -74,22 +117,12 @@ const ExcelClone = () => {
                   {rowIndex + 1}
                 </td>
                 {Array(COLS).fill().map((_, colIndex) => (
-                  <td
+                  <Cell
                     key={colIndex}
-                    className={`border border-gray-300 p-0 relative ${
-                      selectedCell?.row === rowIndex && selectedCell?.col === colIndex
-                        ? 'bg-blue-50'
-                        : ''
-                    }`}
-                  >
-                    <input
-                      type="text"
-                      className="w-full h-full px-2 py-1 border-none outline-none bg-transparent"
-                      value={data[rowIndex][colIndex]}
-                      onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                      onClick={() => handleCellSelect(rowIndex, colIndex)}
-                    />
-                  </td>
+                    value={data[rowIndex][colIndex]}
+                    rowIndex={rowIndex}
+                    colIndex={colIndex}
+                  />
                 ))}
               </tr>
             ))}
