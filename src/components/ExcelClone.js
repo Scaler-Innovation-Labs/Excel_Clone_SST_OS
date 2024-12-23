@@ -108,7 +108,7 @@ const ExcelClone = () => {
   return (
     <div className="flex flex-col h-screen">
       {/* Top Bar */}
-      <div className="flex items-center p-2 bg-gray-200">
+      <div className="flex items-center p-2 bg-gray-100">
         <div className="flex space-x-2 items-center">
           <div className="font-mono bg-white px-2 py-1 border border-gray-300">
             {selectedCell ? `${getColumnLabel(selectedCell.col)}${selectedCell.row + 1}` : ''}
@@ -134,9 +134,16 @@ const ExcelClone = () => {
         <table className="border-collapse w-full">
           <thead>
             <tr>
-              <th className="w-12 bg-gray-100 border border-gray-300"></th>
+              <th className="w-12 bg-gradient-to-b from-slate-900 to-slate-800 text-white font-semibold border border-slate-700 
+                           shadow-sm sticky top-0 z-20"></th>
               {Array(COLS).fill().map((_, i) => (
-                <th key={i} className="w-24 bg-gray-100 border border-gray-300 px-2">
+                <th 
+                  key={i} 
+                  className="w-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white font-semibold px-3 py-2 
+                           border border-slate-700
+                           hover:bg-gradient-to-b hover:from-slate-800 hover:to-slate-700 transition-all duration-150
+                           shadow-sm text-center tracking-wide sticky top-0 z-10 text-sm"
+                >
                   {getColumnLabel(i)}
                 </th>
               ))}
@@ -145,13 +152,15 @@ const ExcelClone = () => {
           <tbody>
             {Array(ROWS).fill().map((_, rowIndex) => (
               <tr key={rowIndex}>
-                <td className="bg-gray-100 border border-gray-300 text-center">
+                <td className="bg-gradient-to-r from-slate-900 to-slate-800 text-white font-medium border border-slate-700 
+                             text-center py-1.5 hover:from-slate-800 hover:to-slate-700 transition-all duration-150 
+                             sticky left-0 z-10 text-sm">
                   {rowIndex + 1}
                 </td>
                 {Array(COLS).fill().map((_, colIndex) => (
                   <td
                     key={colIndex}
-                    className={`border border-gray-300 p-0 relative ${
+                    className={`border border-gray-200 p-0 relative ${
                       selectedCell?.row === rowIndex && selectedCell?.col === colIndex
                         ? 'bg-blue-50 border-4 border-pink-300'
                         : ''
