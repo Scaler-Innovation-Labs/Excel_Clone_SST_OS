@@ -149,12 +149,22 @@ const ExcelClone = () => {
                   {rowIndex + 1}
                 </td>
                 {Array(COLS).fill().map((_, colIndex) => (
-                  <Cell
+                  <td
                     key={colIndex}
-                    value={data[rowIndex][colIndex]}
-                    rowIndex={rowIndex}
-                    colIndex={colIndex}
-                  />
+                    className={`border border-gray-300 p-0 relative ${
+                      selectedCell?.row === rowIndex && selectedCell?.col === colIndex
+                        ? 'bg-blue-50 border-4 border-pink-300'
+                        : ''
+                    }`}
+                  >
+                    <input
+                      type="text"
+                      className="w-full h-full px-2 py-1 border-none outline-none bg-transparent"
+                      value={data[rowIndex][colIndex]}
+                      onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
+                      onClick={() => handleCellSelect(rowIndex, colIndex)}
+                    />
+                  </td>
                 ))}
               </tr>
             ))}
