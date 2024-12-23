@@ -78,7 +78,7 @@ const ExcelClone = () => {
                     key={colIndex}
                     className={`border border-gray-300 p-0 relative ${
                       selectedCell?.row === rowIndex && selectedCell?.col === colIndex
-                        ? 'bg-blue-50'
+                        ? 'bg-blue-50 border-4 border-pink-300'
                         : ''
                     }`}
                   >
