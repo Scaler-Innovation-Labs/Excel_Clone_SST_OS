@@ -75,6 +75,14 @@ const ExcelClone = () => {
     };
   }, []);
 
+  const handleDoubleClick = (rowIndex, colIndex) => {
+    handleCellSelect(rowIndex, colIndex);
+    const cellInput = document.getElementById(`cell-${rowIndex}-${colIndex}`);
+    if (cellInput) {
+      cellInput.select();
+    }
+  };
+
   const Cell = ({ value, rowIndex, colIndex }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const isInvalid = invalidCells.has(`${rowIndex}-${colIndex}`);
@@ -91,6 +99,7 @@ const ExcelClone = () => {
           onMouseLeave={() => setShowTooltip(false)}
         >
           <input
+            id={`cell-${rowIndex}-${colIndex}`} // Unique ID for each cell
             type="text"
             className={`w-full h-full px-2 py-1 border-none outline-none bg-transparent ${
               isInvalid ? 'bg-red-50' : ''
@@ -98,6 +107,7 @@ const ExcelClone = () => {
             value={value}
             onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
             onClick={() => handleCellSelect(rowIndex, colIndex)}
+            onDoubleClick={() => handleDoubleClick(rowIndex, colIndex)} // Add double-click handler
           />
           {showTooltip && <Tooltip text={tooltipText} position="bottom" />}
         </div>
@@ -158,22 +168,12 @@ const ExcelClone = () => {
                   {rowIndex + 1}
                 </td>
                 {Array(COLS).fill().map((_, colIndex) => (
-                  <td
+                  <Cell
                     key={colIndex}
-                    className={`border border-gray-200 p-0 relative ${
-                      selectedCell?.row === rowIndex && selectedCell?.col === colIndex
-                        ? 'bg-blue-50 border-4 border-pink-300'
-                        : ''
-                    }`}
-                  >
-                    <input
-                      type="text"
-                      className="w-full h-full px-2 py-1 border-none outline-none bg-transparent"
-                      value={data[rowIndex][colIndex]}
-                      onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                      onClick={() => handleCellSelect(rowIndex, colIndex)}
-                    />
-                  </td>
+                    value={data[rowIndex][colIndex]}
+                    rowIndex={rowIndex}
+                    colIndex={colIndex}
+                  />
                 ))}
               </tr>
             ))}
