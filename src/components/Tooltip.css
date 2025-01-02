@@ -1,0 +1,31 @@
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .tooltip.bottom {
+    transform: translateY(100%);
+    top: 100%;
+  }
+  
+  .tooltip.top {
+    transform: translateY(-100%);
+    bottom: 100%;
+  }
+  
+  .tooltip.left {
+    transform: translateX(-100%);
+    right: 100%;
+  }
+  
+  .tooltip.right {
+    transform: translateX(100%);
+    left: 100%;
+  }
+  
