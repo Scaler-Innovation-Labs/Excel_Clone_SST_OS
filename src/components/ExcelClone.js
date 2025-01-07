@@ -87,6 +87,14 @@ const ExcelClone = () => {
     };
   }, [selectedCell]);
 
+  const handleDoubleClick = (rowIndex, colIndex) => {
+    handleCellSelect(rowIndex, colIndex);
+    const cellInput = document.getElementById(`cell-${rowIndex}-${colIndex}`);
+    if (cellInput) {
+      cellInput.select();
+    }
+  };
+
   const Cell = ({ value, rowIndex, colIndex }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const isInvalid = invalidCells.has(`${rowIndex}-${colIndex}`);
@@ -103,6 +111,7 @@ const ExcelClone = () => {
           onMouseLeave={() => setShowTooltip(false)}
         >
           <input
+            id={`cell-${rowIndex}-${colIndex}`} // Unique ID for each cell
             type="text"
             className={`w-full h-full px-2 py-1 border-none outline-none bg-transparent ${
               isInvalid ? 'bg-red-50' : ''
@@ -110,6 +119,7 @@ const ExcelClone = () => {
             value={value}
             onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
             onClick={() => handleCellSelect(rowIndex, colIndex)}
+            onDoubleClick={() => handleDoubleClick(rowIndex, colIndex)} // Add double-click handler
           />
           {showTooltip && <Tooltip text={tooltipText} position="bottom" />}
         </div>
