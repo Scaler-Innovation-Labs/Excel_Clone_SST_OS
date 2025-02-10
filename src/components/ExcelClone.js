@@ -1,5 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import './Tooltip.css'; // Add tooltip styles
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  selectCell,
+  updateCell,
+  setFormulaBarValue,
+  selectSpreadsheetData,
+  selectSelectedCell,
+  selectFormulaBarValue,
+  selectError,
+  selectInvalidCells,
+  selectTooltipText
+} from '../store/spreadsheetSlice';
+import './Tooltip.css';
 
 const Tooltip = ({ text, position }) => {
   return (
@@ -11,51 +23,24 @@ const Tooltip = ({ text, position }) => {
 
 const ExcelClone = () => {
   const ROWS = 20;
-  const COLS = 26; // A to Z
-  const [data, setData] = useState(Array(ROWS).fill().map(() => Array(COLS).fill('')));
-  const [selectedCell, setSelectedCell] = useState(null);
-  const [formulaBarValue, setFormulaBarValue] = useState('');
-  const [error, setError] = useState(null); // For error messages
-  const [invalidCells, setInvalidCells] = useState(new Set()); // Track invalid cells
-  const [tooltipText, setTooltipText] = useState(''); // State for dynamic tooltip
+  const COLS = 26;
+  const dispatch = useDispatch();
+  
+  const data = useSelector(selectSpreadsheetData);
+  const selectedCell = useSelector(selectSelectedCell);
+  const formulaBarValue = useSelector(selectFormulaBarValue);
+  const error = useSelector(selectError);
+  const invalidCells = useSelector(selectInvalidCells);
+  const tooltipText = useSelector(selectTooltipText);
 
   const getColumnLabel = (index) => String.fromCharCode(65 + index);
 
   const handleCellSelect = (rowIndex, colIndex) => {
-    setSelectedCell({ row: rowIndex, col: colIndex });
-    setFormulaBarValue(data[rowIndex][colIndex]);
-    setError(null);
-  };
-
-  const isValidInput = (value) => {
-    // Allow only numeric input and limit length to 10 characters
-    return /^[0-9]*$/.test(value) && value.length <= 10;
-  };
-
-  const markCellAsInvalid = (row, col, invalid) => {
-    const cellKey = `${row}-${col}`;
-    setInvalidCells((prev) => {
-      const updated = new Set(prev);
-      if (invalid) updated.add(cellKey);
-      else updated.delete(cellKey);
-      return updated;
-    });
+    dispatch(selectCell({ row: rowIndex, col: colIndex }));
   };
 
   const handleCellChange = (rowIndex, colIndex, value) => {
-    if (!isValidInput(value)) {
-      setError('Invalid input: Only numbers are allowed (max 10 characters)');
-      markCellAsInvalid(rowIndex, colIndex, true);
-      return;
-    }
-
-    setError(null); // Clear any previous error
-    markCellAsInvalid(rowIndex, colIndex, false);
-
-    const newData = [...data];
-    newData[rowIndex][colIndex] = value;
-    setData(newData);
-    setFormulaBarValue(value);
+    dispatch(updateCell({ row: rowIndex, col: colIndex, value }));
   };
 
   const handleKeyDown = (e) => {
@@ -65,14 +50,21 @@ const ExcelClone = () => {
     let newRow = row;
     let newCol = col;
 
-    if (e.key === 'ArrowUp') {
-      newRow = Math.max(row - 1, 0);
-    } else if (e.key === 'ArrowDown') {
-      newRow = Math.min(row + 1, ROWS - 1);
-    } else if (e.key === 'ArrowLeft') {
-      newCol = Math.max(col - 1, 0);
-    } else if (e.key === 'ArrowRight') {
-      newCol = Math.min(col + 1, COLS - 1);
+    switch (e.key) {
+      case 'ArrowUp':
+        newRow = Math.max(row - 1, 0);
+        break;
+      case 'ArrowDown':
+        newRow = Math.min(row + 1, ROWS - 1);
+        break;
+      case 'ArrowLeft':
+        newCol = Math.max(col - 1, 0);
+        break;
+      case 'ArrowRight':
+        newCol = Math.min(col + 1, COLS - 1);
+        break;
+      default:
+        return;
     }
 
     if (newRow !== row || newCol !== col) {
@@ -82,9 +74,7 @@ const ExcelClone = () => {
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedCell]);
 
   const handleDoubleClick = (rowIndex, colIndex) => {
@@ -96,8 +86,8 @@ const ExcelClone = () => {
   };
 
   const Cell = ({ value, rowIndex, colIndex }) => {
-    const [showTooltip, setShowTooltip] = useState(false);
-    const isInvalid = invalidCells.has(`${rowIndex}-${colIndex}`);
+    const [showTooltip, setShowTooltip] = React.useState(false);
+    const isInvalid = invalidCells.includes(`${rowIndex}-${colIndex}`);
 
     return (
       <td
@@ -111,7 +101,7 @@ const ExcelClone = () => {
           onMouseLeave={() => setShowTooltip(false)}
         >
           <input
-            id={`cell-${rowIndex}-${colIndex}`} // Unique ID for each cell
+            id={`cell-${rowIndex}-${colIndex}`}
             type="text"
             className={`w-full h-full px-2 py-1 border-none outline-none bg-transparent ${
               isInvalid ? 'bg-red-50' : ''
@@ -119,7 +109,7 @@ const ExcelClone = () => {
             value={value}
             onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
             onClick={() => handleCellSelect(rowIndex, colIndex)}
-            onDoubleClick={() => handleDoubleClick(rowIndex, colIndex)} // Add double-click handler
+            onDoubleClick={() => handleDoubleClick(rowIndex, colIndex)}
           />
           {showTooltip && <Tooltip text={tooltipText} position="bottom" />}
         </div>
@@ -127,9 +117,10 @@ const ExcelClone = () => {
     );
   };
 
+  // Rest of the component remains the same...
   return (
     <div className="flex flex-col h-screen">
-      {/* Top Bar */}
+      {/* Formula Bar */}
       <div className="flex items-center p-2 bg-gray-100">
         <div className="flex space-x-2 items-center">
           <div className="font-mono bg-white px-2 py-1 border border-gray-300">
@@ -144,14 +135,14 @@ const ExcelClone = () => {
               if (selectedCell) {
                 handleCellChange(selectedCell.row, selectedCell.col, value);
               }
-              setFormulaBarValue(value);
+              dispatch(setFormulaBarValue(value));
             }}
           />
         </div>
         {error && <span className="text-red-500 text-sm ml-4">{error}</span>}
       </div>
 
-      {/* Spreadsheet */}
+      {/* Spreadsheet Grid */}
       <div className="flex-1 overflow-auto">
         <table className="border-collapse w-full">
           <thead>
