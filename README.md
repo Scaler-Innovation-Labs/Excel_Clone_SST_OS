@@ -40,7 +40,7 @@ A lightweight Excel clone built with React.js, designed as a learning project fo
 1. Clone the repository
 ```bash
 git clone https://github.com/Scaler-Innovation-Labs/Excel_Clone_SST_OS.git
-cd excel-clone
+cd Excel_Clone_SST_OS
 ```
 
 2. Install dependencies
