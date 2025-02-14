@@ -2,7 +2,7 @@ name: Track Contributions
 
 on:
   schedule:
-    -  cron: '0 0 * * 0' 
+    - cron: '0 0 * * 7'  # Runs every Sunday at midnight UTC
 
   workflow_dispatch:  # Allows manual execution
 
