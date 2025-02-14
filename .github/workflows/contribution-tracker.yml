@@ -2,9 +2,8 @@ name: Track Contributions
 
 on:
   schedule:
-    - cron: '0 0 * * 7'  # Runs every Sunday at midnight UTC
-
-  workflow_dispatch:  # Allows manual execution
+    - cron: '0 0 * * *'  # Runs every Sunday at midnight UTC
+  workflow_dispatch:      # Allows manual execution
 
 jobs:
   generate-report:
@@ -12,12 +11,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
+        
       - name: Fetch Contribution Data
         run: |
           curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/repos/Scaler-Innovation-Labs/Excel_Clone_SST_OS/contributors" > contributions.json
-
+          
       - name: Commit & Push Report
         run: |
           git config --global user.name "github-actions[bot]"
